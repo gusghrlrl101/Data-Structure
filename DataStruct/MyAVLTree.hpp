@@ -176,12 +176,8 @@ void MyAVLTree::rotation(MyNode * n) {
 
 				temp = rr_rotation(temp->right);
 
-				if (temp_parent != NULL) {
-					if (isLeft)
-						temp_parent->left = temp;
-					else
-						temp_parent->right = temp;
-				}
+				if (temp_parent != NULL) 
+					(isLeft ? temp_parent->left : temp_parent->right) = temp;
 				break;
 			}
 			// RL
@@ -193,12 +189,8 @@ void MyAVLTree::rotation(MyNode * n) {
 
 				temp = ll_rotation(temp->right->left);
 
-				if (temp_parent != NULL) {
-					if (isLeft)
-						temp_parent->left = temp;
-					else
-						temp_parent->right = temp;
-				}
+				if (temp_parent != NULL)
+					(isLeft ? temp_parent->left : temp_parent->right) = temp;
 
 				rr_rotation(temp);
 				break;
@@ -273,10 +265,10 @@ bool MyAVLTree::remove(int item) {
 			else
 				break;
 		}
-		else if (temp->value < item){
+		else if (temp->value < item) {
 			if (temp->right != NULL)
 				temp = temp->right;
-			else 
+			else
 				break;
 		}
 		else {
@@ -286,30 +278,114 @@ bool MyAVLTree::remove(int item) {
 	}
 
 	if (isRemove) {
-		// parent node ptr ÇØ¾ßÇÔ
+		MyNode* temp_parent = temp->parent;
 		MyNode* ttemp = temp;
+
 		if (ttemp->left != NULL) {
 			ttemp = ttemp->left;
 
 			if (ttemp->right != NULL) {
 				while (ttemp->right != NULL)
 					ttemp = ttemp->right;
+				
+				if (temp_parent != NULL) {
+					bool isLeft = true;
+					if (temp_parent->right == temp)
+						isLeft = false;
 
-				ttemp->parent->right = ttemp->left;
-				if (ttemp->left != NULL)
-					ttemp->left->parent = ttemp->parent;
+					(isLeft ? temp_parent->left : temp_parent->right) = ttemp;
+					ttemp->parent = temp_parent;
 
-				ttemp->left = temp->left;
-				temp->left->parent = ttemp;
+					ttemp->left = temp->left;
+					temp->left->parent = ttemp;
+
+					ttemp->right = temp->right;
+					if (temp->right != NULL)
+						temp->right->parent = ttemp;
+
+					delete temp;
+				}
+				else {
+					root = ttemp;
+					ttemp->parent = NULL;
+
+					ttemp->left = temp->left;
+					temp->left->parent = ttemp;
+
+					ttemp->right = temp->right;
+					if (temp->right != NULL)
+						temp->right->parent = ttemp;
+
+					delete temp;
+				}
 			}
-			else
-				temp->left = ttemp->left;
+			else {
+				if (temp_parent != NULL) {
+					bool isLeft = true;
+					if (temp_parent->right == temp)
+						isLeft = false;
+
+					(isLeft ? temp_parent->left : temp_parent->right) = ttemp;
+					ttemp->parent = temp_parent;
+
+					ttemp->right = temp->right;
+					if (temp->right != NULL)
+						temp->right->parent = ttemp;
+
+					delete temp;
+				}
+				else {
+					root = ttemp;
+					ttemp->parent = NULL;
+
+					ttemp->right = temp->right;
+					if (temp->right != NULL)
+						temp->right->parent = ttemp;
+
+					delete temp;
+				}
+			}
 		}
 		else {
-			temp->right->parent = NULL;
-		}
-	}
+			if (temp->right != NULL) {
+				if (temp_parent != NULL) {
+					bool isLeft = true;
+					if (temp_parent->right == temp)
+						isLeft = false;
 
+					(isLeft ? temp_parent->left : temp_parent->right) = temp->right;
+					temp->right->parent = temp_parent;
+
+					delete temp;
+				}
+				else {
+					root = temp->right;
+					temp->right->parent = NULL;
+					delete temp;
+				}
+			}
+			else {
+				if (temp_parent != NULL) {
+					bool isLeft = true;
+					if (temp_parent->right == temp)
+						isLeft = false;
+
+					(isLeft ? temp_parent->left : temp_parent->right) = NULL;
+
+					delete temp;
+				}
+				else {
+					root = NULL;
+					delete temp;
+				}
+			}
+		}
+
+
+		size--;
+		refresh_height(root);
+		refresh_balance(root);
+	}
 
 	return isRemove;
 }

@@ -11,7 +11,11 @@ int main() {
 		if (temp == 0)
 			break;
 
-		myAvlTree.insert(temp);
+		if (temp > 0)
+			myAvlTree.insert(temp);
+		else
+			myAvlTree.remove(-temp);
+
 		myAvlTree.preorder();
 	}
 
