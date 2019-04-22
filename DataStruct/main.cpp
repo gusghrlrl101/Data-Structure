@@ -1,9 +1,9 @@
 #include <iostream>
-#include "AVL_tree.hpp"
+#include "MyAVLTree.hpp"
 using namespace std;
 
 int main() {
-	AVL_tree avlTree;
+	MyAVLTree myAvlTree;
 
 	int temp;
 	while (true) {
@@ -11,8 +11,8 @@ int main() {
 		if (temp == 0)
 			break;
 
-		avlTree.insert(temp);
-		avlTree.preorder();
+		myAvlTree.insert(temp);
+		myAvlTree.preorder();
 	}
 
 	return 0;

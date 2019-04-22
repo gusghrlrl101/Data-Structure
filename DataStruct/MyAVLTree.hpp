@@ -1,38 +1,39 @@
-#ifndef AVL_TREE_HPP
-#define AVL_TREE_HPP
+#ifndef MYAVLTREE_HPP
+#define MYAVLTREE_HPP
 
 #include <iostream>
 #include <algorithm>
 using namespace std;
 
-typedef struct node {
+typedef struct MyNode {
 	int value = 0;
 	int height = 0;
 	short balance = 0;
-	node* left = NULL;
-	node* right = NULL;
-	node* parent = NULL;
+	MyNode* left = NULL;
+	MyNode* right = NULL;
+	MyNode* parent = NULL;
 
-	node(int value = 0) {
+	MyNode(int value = 0) {
 		this->value = value;
 	}
-}node;
+}MyNode;
 
-class AVL_tree {
+class MyAVLTree {
 private:
-	node* root = new node();
+	MyNode* root = new MyNode();
 	int size = 0;
 
-	void preorder_in(node*);
-	void insert_to_leap(int, node*);
-	int refresh_height(node*);
-	void refresh_balance(node*);
-	void rotation(node*);
-	node* ll_rotation(node*);
-	node* rr_rotation(node*);
+	void preorder_in(MyNode*);
+	void insert_to_leap(int, MyNode*);
+	int refresh_height(MyNode*);
+	void refresh_balance(MyNode*);
+	void rotation(MyNode*);
+	MyNode* ll_rotation(MyNode*);
+	MyNode* rr_rotation(MyNode*);
 
 public:
 	void insert(int);
+	bool remove(int);
 	bool isEmpty();
 	int getSize();
 	void preorder();
@@ -40,7 +41,7 @@ public:
 
 // private function
 
-void AVL_tree::preorder_in(node* item) {
+void MyAVLTree::preorder_in(MyNode* item) {
 	if (item->left != NULL)
 		preorder_in(item->left);
 
@@ -55,8 +56,8 @@ void AVL_tree::preorder_in(node* item) {
 		preorder_in(item->right);
 }
 
-void AVL_tree::insert_to_leap(int item, node* n) {
-	node* temp = root;
+void MyAVLTree::insert_to_leap(int item, MyNode* n) {
+	MyNode* temp = root;
 
 	while (true) {
 		if (item < temp->value) {
@@ -87,8 +88,8 @@ void AVL_tree::insert_to_leap(int item, node* n) {
 	refresh_balance(root);
 }
 
-int AVL_tree::refresh_height(node* n) {
-	node* temp = n;
+int MyAVLTree::refresh_height(MyNode* n) {
+	MyNode* temp = n;
 
 	int left_height = 0;
 	if (temp->left != NULL)
@@ -101,8 +102,8 @@ int AVL_tree::refresh_height(node* n) {
 	return (temp->height = max(left_height, right_height) + 1);
 }
 
-void AVL_tree::refresh_balance(node* n) {
-	node* temp = n;
+void MyAVLTree::refresh_balance(MyNode* n) {
+	MyNode* temp = n;
 
 	int left_height = 0;
 	if (temp->left != NULL) {
@@ -119,8 +120,8 @@ void AVL_tree::refresh_balance(node* n) {
 	temp->balance = left_height - right_height;
 }
 
-void AVL_tree::rotation(node * n) {
-	node* temp = n;
+void MyAVLTree::rotation(MyNode * n) {
+	MyNode* temp = n;
 
 	while (temp->parent != NULL) {
 		temp = temp->parent;
@@ -129,7 +130,7 @@ void AVL_tree::rotation(node * n) {
 		if (1 < temp->balance) {
 			// LL
 			if (0 < temp->left->balance) {
-				node* temp_parent = temp->parent;
+				MyNode* temp_parent = temp->parent;
 				bool isLeft = true;
 				if (temp_parent != NULL && temp_parent->right == temp)
 					isLeft = false;
@@ -146,10 +147,20 @@ void AVL_tree::rotation(node * n) {
 			}
 			// LR
 			else if (temp->left->balance < 0) {
-				node* temp_parent = temp;
+				MyNode* temp_parent = temp->parent;
+				bool isLeft = true;
+				if (temp_parent != NULL && temp_parent->right == temp)
+					isLeft = false;
+
 				temp = rr_rotation(temp->left->right);
 
-				temp_parent->left = temp;
+				if (temp_parent != NULL) {
+					if (isLeft)
+						temp_parent->left = temp;
+					else
+						temp_parent->right = temp;
+				}
+
 				ll_rotation(temp);
 				break;
 			}
@@ -158,7 +169,7 @@ void AVL_tree::rotation(node * n) {
 		else if (temp->balance < -1) {
 			// RR
 			if (temp->right->balance < 0) {
-				node* temp_parent = temp->parent;
+				MyNode* temp_parent = temp->parent;
 				bool isLeft = true;
 				if (temp_parent != NULL && temp_parent->right == temp)
 					isLeft = false;
@@ -175,10 +186,20 @@ void AVL_tree::rotation(node * n) {
 			}
 			// RL
 			else if (0 < temp->right->balance) {
-				node* temp_parent = temp;
+				MyNode* temp_parent = temp->parent;
+				bool isLeft = true;
+				if (temp_parent != NULL && temp_parent->right == temp)
+					isLeft = false;
+
 				temp = ll_rotation(temp->right->left);
 
-				temp_parent->right = temp;
+				if (temp_parent != NULL) {
+					if (isLeft)
+						temp_parent->left = temp;
+					else
+						temp_parent->right = temp;
+				}
+
 				rr_rotation(temp);
 				break;
 			}
@@ -189,13 +210,13 @@ void AVL_tree::rotation(node * n) {
 	refresh_balance(root);
 }
 
-node* AVL_tree::ll_rotation(node* temp) {
+MyNode* MyAVLTree::ll_rotation(MyNode* temp) {
 	temp->parent->left = temp->right;
 	if (temp->right != NULL)
 		temp->right->parent = temp->parent;
 
 	temp->right = temp->parent;
-	node* temp_parent = temp->parent->parent;
+	MyNode* temp_parent = temp->parent->parent;
 	temp->parent->parent = temp;
 	temp->parent = temp_parent;
 
@@ -205,13 +226,13 @@ node* AVL_tree::ll_rotation(node* temp) {
 	return temp;
 }
 
-node* AVL_tree::rr_rotation(node* temp) {
+MyNode* MyAVLTree::rr_rotation(MyNode* temp) {
 	temp->parent->right = temp->left;
 	if (temp->left != NULL)
 		temp->left->parent = temp->parent;
 
 	temp->left = temp->parent;
-	node* temp_parent = temp->parent->parent;
+	MyNode* temp_parent = temp->parent->parent;
 	temp->parent->parent = temp;
 	temp->parent = temp_parent;
 
@@ -223,10 +244,9 @@ node* AVL_tree::rr_rotation(node* temp) {
 
 // public function
 
-void AVL_tree::insert(int item) {
-	node* n = new node(item);
+void MyAVLTree::insert(int item) {
+	MyNode* n = new MyNode(item);
 	n->value = item;
-
 
 	if (isEmpty()) {
 		root = n;
@@ -241,15 +261,68 @@ void AVL_tree::insert(int item) {
 	size++;
 }
 
-bool AVL_tree::isEmpty() {
+bool MyAVLTree::remove(int item) {
+	bool isRemove = false;
+
+	MyNode* temp = root;
+
+	while (true) {
+		if (item < temp->value) {
+			if (temp->left != NULL)
+				temp = temp->left;
+			else
+				break;
+		}
+		else if (temp->value < item){
+			if (temp->right != NULL)
+				temp = temp->right;
+			else 
+				break;
+		}
+		else {
+			isRemove = true;
+			break;
+		}
+	}
+
+	if (isRemove) {
+		// parent node ptr ÇØ¾ßÇÔ
+		MyNode* ttemp = temp;
+		if (ttemp->left != NULL) {
+			ttemp = ttemp->left;
+
+			if (ttemp->right != NULL) {
+				while (ttemp->right != NULL)
+					ttemp = ttemp->right;
+
+				ttemp->parent->right = ttemp->left;
+				if (ttemp->left != NULL)
+					ttemp->left->parent = ttemp->parent;
+
+				ttemp->left = temp->left;
+				temp->left->parent = ttemp;
+			}
+			else
+				temp->left = ttemp->left;
+		}
+		else {
+			temp->right->parent = NULL;
+		}
+	}
+
+
+	return isRemove;
+}
+
+bool MyAVLTree::isEmpty() {
 	return (size == 0);
 }
 
-int AVL_tree::getSize() {
+int MyAVLTree::getSize() {
 	return size;
 }
 
-void AVL_tree::preorder() {
+void MyAVLTree::preorder() {
 	preorder_in(root);
 	cout << '\n';
 }
