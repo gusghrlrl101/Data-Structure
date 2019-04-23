@@ -398,6 +398,8 @@ bool MyAVLTree<T>::remove(T item) {
 		size--;
 		refresh_height(root);
 		refresh_balance(root);
+
+		// TODO: rotation
 	}
 
 	return isRemove;
