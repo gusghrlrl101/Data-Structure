@@ -5,35 +5,39 @@
 #include <algorithm>
 using namespace std;
 
-typedef struct MyNode {
-	int value = 0;
+template <class T>
+class MyNode {
+public:
+	T value;
 	int height = 0;
 	short balance = 0;
 	MyNode* left = NULL;
 	MyNode* right = NULL;
 	MyNode* parent = NULL;
 
-	MyNode(int value = 0) {
+	MyNode() {};
+	MyNode(T value) {
 		this->value = value;
 	}
-}MyNode;
+};
 
+template <class T>
 class MyAVLTree {
 private:
-	MyNode* root = new MyNode();
+	MyNode<T>* root = new MyNode<T>();
 	int size = 0;
 
-	void preorder_in(MyNode*);
-	void insert_to_leap(int, MyNode*);
-	int refresh_height(MyNode*);
-	void refresh_balance(MyNode*);
-	void rotation(MyNode*);
-	MyNode* ll_rotation(MyNode*);
-	MyNode* rr_rotation(MyNode*);
+	void preorder_in(MyNode<T>*);
+	void insert_to_leap(T, MyNode<T>*);
+	int refresh_height(MyNode<T>*);
+	void refresh_balance(MyNode<T>*);
+	void rotation(MyNode<T>*);
+	MyNode<T>* ll_rotation(MyNode<T>*);
+	MyNode<T>* rr_rotation(MyNode<T>*);
 
 public:
-	void insert(int);
-	bool remove(int);
+	void insert(T);
+	bool remove(T);
 	bool isEmpty();
 	int getSize();
 	void preorder();
@@ -41,7 +45,8 @@ public:
 
 // private function
 
-void MyAVLTree::preorder_in(MyNode* item) {
+template <class T>
+void MyAVLTree<T>::preorder_in(MyNode<T>* item) {
 	if (item->left != NULL)
 		preorder_in(item->left);
 
@@ -56,8 +61,9 @@ void MyAVLTree::preorder_in(MyNode* item) {
 		preorder_in(item->right);
 }
 
-void MyAVLTree::insert_to_leap(int item, MyNode* n) {
-	MyNode* temp = root;
+template <class T>
+void MyAVLTree<T>::insert_to_leap(T item, MyNode<T>* n) {
+	MyNode<T>* temp = root;
 
 	while (true) {
 		if (item < temp->value) {
@@ -88,8 +94,9 @@ void MyAVLTree::insert_to_leap(int item, MyNode* n) {
 	refresh_balance(root);
 }
 
-int MyAVLTree::refresh_height(MyNode* n) {
-	MyNode* temp = n;
+template <class T>
+int MyAVLTree<T>::refresh_height(MyNode<T>* n) {
+	MyNode<T>* temp = n;
 
 	int left_height = 0;
 	if (temp->left != NULL)
@@ -102,8 +109,9 @@ int MyAVLTree::refresh_height(MyNode* n) {
 	return (temp->height = max(left_height, right_height) + 1);
 }
 
-void MyAVLTree::refresh_balance(MyNode* n) {
-	MyNode* temp = n;
+template <class T>
+void MyAVLTree<T>::refresh_balance(MyNode<T>* n) {
+	MyNode<T>* temp = n;
 
 	int left_height = 0;
 	if (temp->left != NULL) {
@@ -120,8 +128,9 @@ void MyAVLTree::refresh_balance(MyNode* n) {
 	temp->balance = left_height - right_height;
 }
 
-void MyAVLTree::rotation(MyNode * n) {
-	MyNode* temp = n;
+template <class T>
+void MyAVLTree<T>::rotation(MyNode<T> * n) {
+	MyNode<T>* temp = n;
 
 	while (temp->parent != NULL) {
 		temp = temp->parent;
@@ -130,7 +139,7 @@ void MyAVLTree::rotation(MyNode * n) {
 		if (1 < temp->balance) {
 			// LL
 			if (0 < temp->left->balance) {
-				MyNode* temp_parent = temp->parent;
+				MyNode<T>* temp_parent = temp->parent;
 				bool isLeft = true;
 				if (temp_parent != NULL && temp_parent->right == temp)
 					isLeft = false;
@@ -147,7 +156,7 @@ void MyAVLTree::rotation(MyNode * n) {
 			}
 			// LR
 			else if (temp->left->balance < 0) {
-				MyNode* temp_parent = temp->parent;
+				MyNode<T>* temp_parent = temp->parent;
 				bool isLeft = true;
 				if (temp_parent != NULL && temp_parent->right == temp)
 					isLeft = false;
@@ -169,7 +178,7 @@ void MyAVLTree::rotation(MyNode * n) {
 		else if (temp->balance < -1) {
 			// RR
 			if (temp->right->balance < 0) {
-				MyNode* temp_parent = temp->parent;
+				MyNode<T>* temp_parent = temp->parent;
 				bool isLeft = true;
 				if (temp_parent != NULL && temp_parent->right == temp)
 					isLeft = false;
@@ -182,7 +191,7 @@ void MyAVLTree::rotation(MyNode * n) {
 			}
 			// RL
 			else if (0 < temp->right->balance) {
-				MyNode* temp_parent = temp->parent;
+				MyNode<T>* temp_parent = temp->parent;
 				bool isLeft = true;
 				if (temp_parent != NULL && temp_parent->right == temp)
 					isLeft = false;
@@ -202,13 +211,14 @@ void MyAVLTree::rotation(MyNode * n) {
 	refresh_balance(root);
 }
 
-MyNode* MyAVLTree::ll_rotation(MyNode* temp) {
+template <class T>
+MyNode<T>* MyAVLTree<T>::ll_rotation(MyNode<T>* temp) {
 	temp->parent->left = temp->right;
 	if (temp->right != NULL)
 		temp->right->parent = temp->parent;
 
 	temp->right = temp->parent;
-	MyNode* temp_parent = temp->parent->parent;
+	MyNode<T>* temp_parent = temp->parent->parent;
 	temp->parent->parent = temp;
 	temp->parent = temp_parent;
 
@@ -218,13 +228,14 @@ MyNode* MyAVLTree::ll_rotation(MyNode* temp) {
 	return temp;
 }
 
-MyNode* MyAVLTree::rr_rotation(MyNode* temp) {
+template <class T>
+MyNode<T>* MyAVLTree<T>::rr_rotation(MyNode<T>* temp) {
 	temp->parent->right = temp->left;
 	if (temp->left != NULL)
 		temp->left->parent = temp->parent;
 
 	temp->left = temp->parent;
-	MyNode* temp_parent = temp->parent->parent;
+	MyNode<T>* temp_parent = temp->parent->parent;
 	temp->parent->parent = temp;
 	temp->parent = temp_parent;
 
@@ -236,8 +247,9 @@ MyNode* MyAVLTree::rr_rotation(MyNode* temp) {
 
 // public function
 
-void MyAVLTree::insert(int item) {
-	MyNode* n = new MyNode(item);
+template <class T>
+void MyAVLTree<T>::insert(T item) {
+	MyNode<T>* n = new MyNode<T>(item);
 	n->value = item;
 
 	if (isEmpty()) {
@@ -253,10 +265,11 @@ void MyAVLTree::insert(int item) {
 	size++;
 }
 
-bool MyAVLTree::remove(int item) {
+template <class T>
+bool MyAVLTree<T>::remove(T item) {
 	bool isRemove = false;
 
-	MyNode* temp = root;
+	MyNode<T>* temp = root;
 
 	while (true) {
 		if (item < temp->value) {
@@ -278,8 +291,8 @@ bool MyAVLTree::remove(int item) {
 	}
 
 	if (isRemove) {
-		MyNode* temp_parent = temp->parent;
-		MyNode* ttemp = temp;
+		MyNode<T>* temp_parent = temp->parent;
+		MyNode<T>* ttemp = temp;
 
 		if (ttemp->left != NULL) {
 			ttemp = ttemp->left;
@@ -390,15 +403,18 @@ bool MyAVLTree::remove(int item) {
 	return isRemove;
 }
 
-bool MyAVLTree::isEmpty() {
+template <class T>
+bool MyAVLTree<T>::isEmpty() {
 	return (size == 0);
 }
 
-int MyAVLTree::getSize() {
+template <class T>
+int MyAVLTree<T>::getSize() {
 	return size;
 }
 
-void MyAVLTree::preorder() {
+template <class T>
+void MyAVLTree<T>::preorder() {
 	preorder_in(root);
 	cout << '\n';
 }
